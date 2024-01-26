@@ -22,7 +22,7 @@ const AddMealForm = () => {
     e.preventDefault();
 
     // Send a POST request to the backend to add the meal
-    fetch('http://127.0.0.1:5555//meal', {
+    fetch('http://127.0.0.1:5000//meal', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
