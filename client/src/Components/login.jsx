@@ -43,7 +43,11 @@ function LogInForm({ navigate }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     fetch("http://127.0.0.1:5000//login", {
+=======
+    fetch("http://127.0.0.1:5555//login", {
+>>>>>>> refs/remotes/origin/backend
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +119,11 @@ function SignUpForm({ navigate }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+<<<<<<< HEAD
     fetch('http://127.0.0.1:5000//signup', {
+=======
+    fetch('http://127.0.0.1:5555//signup', {
+>>>>>>> refs/remotes/origin/backend
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

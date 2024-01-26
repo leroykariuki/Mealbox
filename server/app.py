@@ -14,6 +14,7 @@ api = Api(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 CORS(app)
+FieldError = "Missing Required fields"
 
 @app.route('/')
 def home():
@@ -43,7 +44,7 @@ class UsersResource(Resource):
         password = user_data.get('password')  
 
         if not username or not email or not password:
-            return {"error": "Missing required fields"}, 400
+            return {"error": FieldError}, 400
 
         new_user = User(username=username, email=email, password=password)
         db.session.add(new_user)
@@ -115,7 +116,7 @@ class MealResource(Resource):
         user_id = meal_data.get('user_id')  
 
         if not title or not description or not category or not user_id:
-            return {"error": "Missing required fields"}, 400
+            return {"error": FieldError}, 400
 
         user = User.query.get(user_id)
         if not user:
@@ -177,7 +178,7 @@ def sign_up():
         password = user_data.get('password')
 
         if not username or not email or not password:
-            return jsonify({"error": "Missing required fields"}), 400
+            return jsonify({"error": FieldError}), 400
 
         new_user = User(username=username, email=email, password_hash=password)  
 
