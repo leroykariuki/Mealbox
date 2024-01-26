@@ -84,7 +84,6 @@ class MealResource(Resource):
                     "title": meal.title,
                     "description": meal.description,
                     "category": meal.category,
-                    "image_url": meal.image_url
                 }
                 meal_list.append(meal_dict)
 
