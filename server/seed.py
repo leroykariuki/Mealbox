@@ -19,7 +19,7 @@ def seed_data():
         db.session.commit()
 
     
-        meals = []
+        meal = []
         ingredients = []
 
         user_ids = [user.id for user in users]
