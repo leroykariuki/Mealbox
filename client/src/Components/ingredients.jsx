@@ -5,7 +5,7 @@ function Ingredients() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5555//ingredient')
+    fetch('http://127.0.0.1:5000//ingredient')
       .then((response) => response.json())
       .then((data) => {
         setIngredients(data);
