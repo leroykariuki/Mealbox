@@ -165,7 +165,6 @@ class IngredientResource(Resource):
             else:
                 return {"error": "Ingredient not found"}, 404
     
-    # ... (existing code)
 
 api.add_resource(IngredientResource, '/ingredient', '/ingredient/<int:id>')
 
