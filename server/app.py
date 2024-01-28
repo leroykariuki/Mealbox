@@ -1,16 +1,13 @@
-import os
 from flask import Flask, make_response, jsonify, request, render_template, session
 from models import db, User, Meal, Ingredient
-from flask_restful import Resource, Api
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 
-app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist', static_url_path='')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/leroy/code/phase-2/sample/server/instance/endphase.db'
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meals.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
 db.init_app(app)
-api = Api(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 CORS(app)
@@ -20,188 +17,266 @@ FieldError = "Missing Required fields"
 def home():
     return render_template('index.html')
 
-class UsersResource(Resource):
-    def get(self):
-        user_list = []
-        for user in User.query.all():
-            user_dict = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-            }
-            user_list.append(user_dict)
-
-        response = make_response(
-            jsonify(user_list),
-            200
-        )
-        return response
-
-    def post(self):
-        user_data = request.get_json()
-        username = user_data.get('username')
-        email = user_data.get('email')
-        password = user_data.get('password')  
-
-        if not username or not email or not password:
-            return {"error": FieldError}, 400
-
-        new_user = User(username=username, email=email, password=password)
-        db.session.add(new_user)
-        db.session.commit()
-
-        response_data = {
-            "message": "New User created successfully",
-            "user_id": new_user.id
+# Define the route to get all meals
+@app.route('/meals', methods=['GET'])
+def get_meals():
+    meals = Meal.query.all()
+    mealsdata = [
+        {
+            "id": meal.id,
+            "title": meal.title,
+            "description": meal.description,
+            "category": meal.category,
+            "created_at": meal.created_at,
+            "updated_at": meal.updated_at,
+            "image": meal.image
         }
+        for meal in meals
+    ]
+    return jsonify(mealsdata)
 
-        return response_data, 201
-
-api.add_resource(UsersResource, '/users')
-
-class UserResource(Resource):
-    def get(self, id):
-        user = User.query.filter_by(id=id).first()
-        if user:
-            user_data = {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-            }
-            return user_data, 200
-        else:
-            return {"error": "User not found"}, 404
-
-api.add_resource(UserResource, '/users/<int:id>')
-
-class MealResource(Resource):
-    def get(self, id=None):
-        if id is None:
-            meal_list = []
-            for meal in Meal.query.all():
-                meal_dict = {
-                    "id": meal.id,
-                    "title": meal.title,
-                    "description": meal.description,
-                    "category": meal.category,
-                    "image_url": meal.image_url
-                }
-                meal_list.append(meal_dict)
-
-            response = make_response(
-                jsonify(meal_list),
-                200
-            )
-            return response
-        else:
-            meal = Meal.query.filter_by(id=id).first()
-            if meal:
-                meal_data = {
-                    "id": meal.id,
-                    "title": meal.title,
-                    "description": meal.description,
-                    "category": meal.category,
-                    "image_url": meal.image_url  
-                }
-                return meal_data, 200
-            else:
-                return {"error": "Meal not found"}, 404
-
-    def post(self):
-        meal_data = request.get_json()
-        title = meal_data.get('title')
-        description = meal_data.get('description')
-        category = meal_data.get('category')
-        image_url = meal_data.get('image_url') 
-        user_id = meal_data.get('user_id')  
-
-        if not title or not description or not category or not user_id:
-            return {"error": FieldError}, 400
-
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-
-        new_meal = Meal(title=title, description=description, category=category, image_url=image_url, user=user)
-        db.session.add(new_meal)
-        db.session.commit()
-
-        response_data = {
-            "message": "New Meal created successfully",
-            "meal_id": new_meal.id
+# Define the route to get a specific meal by its ID
+@app.route('/meals/<int:meal_id>', methods=['GET'])
+def get_meal(meal_id):
+    meal = Meal.query.get(meal_id)
+    if meal:
+        mealdata = {
+            "id": meal.id,
+            "title": meal.title,
+            "description": meal.description,
+            "category": meal.category,
+            "created_at": meal.created_at,
+            "updated_at": meal.updated_at,
+            "image": meal.image
         }
+        return jsonify(mealdata)
+    else:
+        return jsonify({"error": "Meal not found"}), 404
 
-        return response_data, 201
+# Define the route to create a new meal
+@app.route('/meals', methods=['POST'])
+def create_meal():
+    meal_data = request.get_json()
+    title = meal_data.get('title')
+    description = meal_data.get('description')
+    category = meal_data.get('category')
+    image = meal_data.get('image')
 
-api.add_resource(MealResource, '/meal', '/meal/<int:id>')
+    if not title or not description or not category:
+        return jsonify({"error": FieldError}), 400
 
-class IngredientResource(Resource):
-    def get(self, id=None):
-        if id is None:
-            ingredient_list = []
-            for ingredient in Ingredient.query.all():
-                ingredient_dict = {
-                    "id": ingredient.id,
-                    "name": ingredient.name,
-                    "quantity": ingredient.quantity,
-                    "unit": ingredient.unit
-                }
-                ingredient_list.append(ingredient_dict)
+    new_meal = Meal(title=title, description=description, category=category, image=image)
+    db.session.add(new_meal)
+    db.session.commit()
 
-            response = make_response(
-                jsonify(ingredient_list),
-                200
-            )
-            return response
-        else:
-            ingredient = Ingredient.query.filter_by(id=id).first()
-            if ingredient:
-                ingredient_data = {
-                    "id": ingredient.id,
-                    "name": ingredient.name,
-                    "quantity": ingredient.quantity,
-                    "unit": ingredient.unit
-                }
-                return ingredient_data, 200
-            else:
-                return {"error": "Ingredient not found"}, 404
-    
+    return jsonify({"message": "New Meal created successfully"}), 201
 
-api.add_resource(IngredientResource, '/ingredient', '/ingredient/<int:id>')
+# Define the route to update an existing meal
+@app.route('/meals/<int:meal_id>', methods=['PUT'])
+def update_meal(meal_id):
+    meal = Meal.query.get(meal_id)
+    if not meal:
+        return jsonify({"error": "Meal not found"}), 404
 
-@app.route('/signup', methods=['POST'])
-def sign_up():
-    if request.method == 'POST':
-        user_data = request.get_json()
-        username = user_data.get('username')
-        email = user_data.get('email')
-        password = user_data.get('password')
+    meal_data = request.get_json()
+    title = meal_data.get('title')
+    description = meal_data.get('description')
+    category = meal_data.get('category')
+    image = meal_data.get('image')
 
-        if not username or not email or not password:
-            return jsonify({"error": FieldError}), 400
+    if title:
+        meal.title = title
+    if description:
+        meal.description = description
+    if category:
+        meal.category = category
+    if image:
+        meal.image = image
 
-        new_user = User(username=username, email=email, password_hash=password)  
+    db.session.commit()
 
-        db.session.add(new_user)
-        db.session.commit()
-        session['user_id'] = new_user.id
+    return jsonify({"message": "Meal updated successfully"}), 200
 
-        return jsonify({"message": "New User created successfully"}), 201
+# Define the route to delete an existing meal
+@app.route('/meals/<int:meal_id>', methods=['DELETE'])
+def delete_meal(meal_id):
+    meal = Meal.query.get(meal_id)
+    if not meal:
+        return jsonify({"error": "Meal not found"}), 404
 
-@app.route('/login', methods=['POST'])
-def login():
-    if request.method == 'POST':
-        login_data = request.get_json()
-        username = login_data.get('username')
-        password = login_data.get('password')
+    db.session.delete(meal)
+    db.session.commit()
 
-        user = User.query.filter_by(username=username).first()
+    return jsonify({"message": "Meal deleted successfully"}), 200
 
-        if user and user.validate_password(password):  
-            session['user_id'] = user.id
-            return jsonify({"message": "Login successful"}), 200
-        else:
-            return jsonify({"message": "Invalid username or password"}), 401
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    users_data = [
+        {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "created_at": user.created_at
+        }
+        for user in users
+    ]
+    return jsonify(users_data)
+
+# Define the route to get a specific user by their ID
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        userdata = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "created_at": user.created_at
+        }
+        return jsonify(userdata)
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+# Define the route to create a new user
+@app.route('/users', methods=['POST'])
+def create_user():
+    user_data = request.get_json()
+    username = user_data.get('username')
+    email = user_data.get('email')
+    password = user_data.get('password')
+
+    if not username or not email or not password:
+        return jsonify({"error": FieldError}), 400
+
+    new_user = User(username=username, email=email, password_hash=password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "New User created successfully"}), 201
+
+# Define the route to update an existing user
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    user_data = request.get_json()
+    username = user_data.get('username')
+    email = user_data.get('email')
+
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+
+    db.session.commit()
+
+    return jsonify({"message": "User updated successfully"}), 200
+
+# Define the route to delete an existing user
+@app.route('/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"message": "User deleted successfully"}), 200
+
+
+# Define the route to get all ingredients
+@app.route('/ingredients', methods=['GET'])
+def get_ingredients():
+    ingredients = Ingredient.query.all()
+    ingredients_data = [
+        {
+            "id": ingredient.id,
+            "name": ingredient.name,
+            "quantity": ingredient.quantity,
+            "unit": ingredient.unit,
+            "meal_id": ingredient.meal_id
+        }
+        for ingredient in ingredients
+    ]
+    return jsonify(ingredients_data)
+
+# Define the route to get a specific ingredient by its ID
+@app.route('/ingredients/<int:ingredient_id>', methods=['GET'])
+def get_ingredient(ingredient_id):
+    ingredient = Ingredient.query.get(ingredient_id)
+    if ingredient:
+        ingredient_data = {
+            "id": ingredient.id,
+            "name": ingredient.name,
+            "quantity": ingredient.quantity,
+            "unit": ingredient.unit,
+            "meal_id": ingredient.meal_id
+        }
+        return jsonify(ingredient_data)
+    else:
+        return jsonify({"error": "Ingredient not found"}), 404
+
+# Define the route to create a new ingredient
+@app.route('/ingredients', methods=['POST'])
+def create_ingredient():
+    ingredient_data = request.get_json()
+    name = ingredient_data.get('name')
+    quantity = ingredient_data.get('quantity')
+    unit = ingredient_data.get('unit')
+    meal_id = ingredient_data.get('meal_id')
+
+    if not name or not quantity or not unit or not meal_id:
+        return jsonify({"error": FieldError}), 400
+
+    new_ingredient = Ingredient(name=name, quantity=quantity, unit=unit, meal_id=meal_id)
+    db.session.add(new_ingredient)
+    db.session.commit()
+
+    return jsonify({"message": "New Ingredient created successfully"}), 201
+
+# Define the route to update an existing ingredient
+@app.route('/ingredients/<int:ingredient_id>', methods=['PUT'])
+def update_ingredient(ingredient_id):
+    ingredient = Ingredient.query.get(ingredient_id)
+    if not ingredient:
+        return jsonify({"error": "Ingredient not found"}), 404
+
+    ingredient_data = request.get_json()
+    name = ingredient_data.get('name')
+    quantity = ingredient_data.get('quantity')
+    unit = ingredient_data.get('unit')
+    meal_id = ingredient_data.get('meal_id')
+
+    if name:
+        ingredient.name = name
+    if quantity:
+        ingredient.quantity = quantity
+    if unit:
+        ingredient.unit = unit
+    if meal_id:
+        ingredient.meal_id = meal_id
+
+    db.session.commit()
+
+    return jsonify({"message": "Ingredient updated successfully"}), 200
+
+# Define the route to delete an existing ingredient
+@app.route('/ingredients/<int:ingredient_id>', methods=['DELETE'])
+def delete_ingredient(ingredient_id):
+    ingredient = Ingredient.query.get(ingredient_id)
+    if not ingredient:
+        return jsonify({"error": "Ingredient not found"}), 404
+
+    db.session.delete(ingredient)
+    db.session.commit()
+
+    return jsonify({"message": "Ingredient deleted successfully"}), 200
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5555, debug=True)
