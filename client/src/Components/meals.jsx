@@ -1,3 +1,5 @@
+// Meals.js
+
 import React, { useEffect, useState } from 'react';
 
 function Meals() {
@@ -6,7 +8,7 @@ function Meals() {
 
   useEffect(() => {
     // Make a GET request to your Flask API
-    fetch('http://127.0.0.1:5000//meal')
+    fetch('http://127.0.0.1:5555/meals')
       .then((response) => response.json())
       .then((data) => {
         setMeals(data);
@@ -36,6 +38,7 @@ function Meals() {
               <div style={styles.description}>
                 <p>{meal.description}</p>
                 <p>Category: {meal.category}</p>
+                <img src={meal.image} alt={meal.title} style={styles.image} /> {/* Add image */}
               </div>
             )}
           </li>
@@ -100,6 +103,12 @@ const styles = {
   description: {
     marginTop: '10px',
     color: '#fff',
+  },
+  image: {
+    maxWidth: '100%',
+    height: 'auto',
+    borderRadius: '8px',
+    marginTop: '10px',
   },
 };
 
