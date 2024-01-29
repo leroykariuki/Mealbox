@@ -14,7 +14,9 @@ function Header() {
           </Navbar.Brand>
             <Nav className="me-auto" >
                 <Nav.Link href="/homepage">Home</Nav.Link>
-                <Nav.Link href="/Contact">Contact Us</Nav.Link>
+                <Nav.Link href="/login">Login</Nav.Link>
+                <Nav.Link href="/Contact">Contact Us</Nav.Link> 
+                
                 {/* <Nav.Link href="/ingredient">Ingredients</Nav.Link> */}
           </Nav>
         </Container>

@@ -6,7 +6,6 @@ const AddMealForm = () => {
     title: '',
     description: '',
     category: '',
-    user_id: 1, 
   });
   const nav = useNavigate();
 
@@ -20,14 +19,18 @@ const AddMealForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Send a POST request to the backend to add the meal
-    fetch('http://127.0.0.1:5000//meal', {
+  
+    const formData = new FormData();
+    formData.append('title', mealData.title);
+    formData.append('description', mealData.description);
+    formData.append('category', mealData.category);
+  
+    fetch('http://127.0.0.1:5000/meal', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify(mealData),
+      body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
