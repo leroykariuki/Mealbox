@@ -3,7 +3,7 @@ from models import db, User, Meal, Ingredient
 
 def seed_data():
     with app.app_context():
-        # Drop and create tables
+        
         db.drop_all()
         db.create_all()
 
@@ -31,7 +31,7 @@ def seed_data():
 
         for user_id in user_ids:
             for meal_data in [
-                {'title': 'Spaghetti Bolognese', 'description': 'Classic Italian dish', 'category': 'Pasta','image':'https://i.pinimg.com/564x/49/ca/e2/49cae2a7cc06f85269b350de24f4394c.jpg'},
+                {'title': 'Spaghetti Bolognese', 'description': 'Classic Italian dish', 'category': 'Pasta','image':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiVy62R4n8Kq_CLdybgwDDIK6OGggWuiS2wQ&usqp=CAU'},
                 {'title': 'Chicken Stir Fry', 'description': 'Healthy and delicious', 'category': 'Asian'},
                 {'title': 'Vegetarian Pizza', 'description': 'Delicious veggie pizza', 'category': 'Pizza'},
                 {'title': 'Grilled Salmon', 'description': 'Fresh and flavorful salmon', 'category': 'Seafood'},

@@ -17,7 +17,7 @@ FieldError = "Missing Required fields"
 def home():
     return render_template('index.html')
 
-# Define the route to get all meals
+# route to get all meals
 @app.route('/meals', methods=['GET'])
 def get_meals():
     meals = Meal.query.all()
@@ -35,7 +35,7 @@ def get_meals():
     ]
     return jsonify(mealsdata)
 
-# Define the route to get a specific meal by its ID
+# route to get a specific meal by its ID
 @app.route('/meals/<int:meal_id>', methods=['GET'])
 def get_meal(meal_id):
     meal = Meal.query.get(meal_id)
@@ -53,7 +53,7 @@ def get_meal(meal_id):
     else:
         return jsonify({"error": "Meal not found"}), 404
 
-# Define the route to create a new meal
+# route to create a new meal
 @app.route('/meals', methods=['POST'])
 def create_meal():
     meal_data = request.get_json()
@@ -71,7 +71,7 @@ def create_meal():
 
     return jsonify({"message": "New Meal created successfully"}), 201
 
-# Define the route to update an existing meal
+# route to update an existing meal
 @app.route('/meals/<int:meal_id>', methods=['PUT'])
 def update_meal(meal_id):
     meal = Meal.query.get(meal_id)
@@ -97,7 +97,7 @@ def update_meal(meal_id):
 
     return jsonify({"message": "Meal updated successfully"}), 200
 
-# Define the route to delete an existing meal
+# route to delete an existing meal
 @app.route('/meals/<int:meal_id>', methods=['DELETE'])
 def delete_meal(meal_id):
     meal = Meal.query.get(meal_id)
@@ -124,7 +124,7 @@ def get_users():
     ]
     return jsonify(users_data)
 
-# Define the route to get a specific user by their ID
+# route to get a specific user by their ID
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = User.query.get(user_id)
@@ -139,7 +139,7 @@ def get_user(user_id):
     else:
         return jsonify({"error": "User not found"}), 404
 
-# Define the route to create a new user
+# route to create a new user
 @app.route('/users', methods=['POST'])
 def create_user():
     user_data = request.get_json()
@@ -156,7 +156,7 @@ def create_user():
 
     return jsonify({"message": "New User created successfully"}), 201
 
-# Define the route to update an existing user
+#  route to update an existing user
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     user = User.query.get(user_id)
@@ -176,7 +176,7 @@ def update_user(user_id):
 
     return jsonify({"message": "User updated successfully"}), 200
 
-# Define the route to delete an existing user
+#  route to delete an existing user
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
@@ -189,7 +189,7 @@ def delete_user(user_id):
     return jsonify({"message": "User deleted successfully"}), 200
 
 
-# Define the route to get all ingredients
+#  route to get all ingredients
 @app.route('/ingredients', methods=['GET'])
 def get_ingredients():
     ingredients = Ingredient.query.all()
@@ -205,7 +205,7 @@ def get_ingredients():
     ]
     return jsonify(ingredients_data)
 
-# Define the route to get a specific ingredient by its ID
+#  route to get a specific ingredient by its ID
 @app.route('/ingredients/<int:ingredient_id>', methods=['GET'])
 def get_ingredient(ingredient_id):
     ingredient = Ingredient.query.get(ingredient_id)
@@ -221,7 +221,7 @@ def get_ingredient(ingredient_id):
     else:
         return jsonify({"error": "Ingredient not found"}), 404
 
-# Define the route to create a new ingredient
+#  route to create a new ingredient
 @app.route('/ingredients', methods=['POST'])
 def create_ingredient():
     ingredient_data = request.get_json()
@@ -239,7 +239,7 @@ def create_ingredient():
 
     return jsonify({"message": "New Ingredient created successfully"}), 201
 
-# Define the route to update an existing ingredient
+# route to update an existing ingredient
 @app.route('/ingredients/<int:ingredient_id>', methods=['PUT'])
 def update_ingredient(ingredient_id):
     ingredient = Ingredient.query.get(ingredient_id)
@@ -265,7 +265,7 @@ def update_ingredient(ingredient_id):
 
     return jsonify({"message": "Ingredient updated successfully"}), 200
 
-# Define the route to delete an existing ingredient
+# route to delete an existing ingredient
 @app.route('/ingredients/<int:ingredient_id>', methods=['DELETE'])
 def delete_ingredient(ingredient_id):
     ingredient = Ingredient.query.get(ingredient_id)
